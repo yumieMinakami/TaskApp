@@ -1,5 +1,7 @@
 package jp.techacademy.yumie.minakami.taskapp;
 
+import org.parceler.Parcel;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -10,8 +12,11 @@ import io.realm.annotations.PrimaryKey;
  * Created by user on 2016/11/22.
  */
 
-
+// measures for close/down app
+@Parcel     // add annotation
 public class Task extends RealmObject implements Serializable {
+// measures for close/down app
+//public class Task extends RealmObject implements Serializable {
     private String  title;           // Title of Task
     private String  contents;       // Contents of Task
     private Date    date;           // Date of Task

@@ -14,6 +14,9 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
 
+import org.parceler.Parcels;
+
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -159,8 +162,15 @@ public class InputActivity extends AppCompatActivity {
 
         realm.close();  // call CLOSE
 
-        Intent resultIntent = new Intent(getApplicationContext(), TaskAlarmReceiver.class); // Create Intent which wakes TaskAlarmReceiver
-        resultIntent.putExtra(MainActivity.EXTRA_TASK, mTask);  // Set Task the intent's Extra to send notification
+        // measures for close/down app
+        Bundle bundle = new Bundle();   // Create new Bundle
+        Intent resultIntent = new Intent(getApplicationContext(), TaskAlarmReceiver.class);  // Create Intent which wakes TaskAlarmReceiver
+        bundle.putParcelable(MainActivity.EXTRA_TASK, Parcels.wrap(mTask)); // reference Parcel for bundle
+        resultIntent.putExtra(MainActivity.EXTRA_TASK, bundle);     // set bundle on the intent extra (pair data of key & its value)
+        // measures for close/down app
+//        Intent resultIntent = new Intent(getApplicationContext(), TaskAlarmReceiver.class); // Create Intent which wakes TaskAlarmReceiver
+////        resultIntent.putExtra(MainActivity.EXTRA_TASK, mTask);  // Set the Task which is the intent's Extra to send notification
+//        resultIntent.putExtra(MainActivity.EXTRA_TASK, (Serializable) mTask);  // Set the Task which is the intent's Extra to send notification (cast)
         PendingIntent resultPendingIntent = PendingIntent.getBroadcast( // Create PendingIntent
                 this,
                 mTask.getId(),  // Set Task ID, Alarm needs to delete when its Task deleted
