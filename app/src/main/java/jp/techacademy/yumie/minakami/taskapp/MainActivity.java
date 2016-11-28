@@ -9,23 +9,27 @@ import android.support.design.widget.FloatingActionButton;
 //import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-//import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Date;
-//import java.util.Date;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
+import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.Sort;
-//import android.view.Menu;
-//import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TextWatcher {
     public final static String EXTRA_TASK = "jp.techacademy.yumie.minakami.taskapp.TASK";   // definition of Intent Extra
 
     // member var
@@ -44,9 +48,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
 
+        EditText meditText = (EditText) findViewById(R.id.eidtText1);   // Set Edittext
+        meditText.addTextChangedListener(this); // Set Listener when changing text
+
+        // Set Floating Action Button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
             task.setId(mTaskRealmResults.get(i).getId());
             task.setTitle(mTaskRealmResults.get(i).getTitle());
             task.setContents(mTaskRealmResults.get(i).getContents());
+            task.setCategory(mTaskRealmResults.get(i).getCategory());
             task.setDate(mTaskRealmResults.get(i).getDate());
 
             taskArrayList.add(task);
@@ -162,6 +169,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void beforeTextChanged(CharSequence s, int strt, int cnt, int aftr){
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int strt, int bfr, int cnt){
+//        EditText met = (EditText) findViewById(R.id.eidtText1);
+//        met.getEditableText().clear();
+    }
+
+    @Override
+    public void afterTextChanged(Editable edtbl){
+        EditText met = (EditText) findViewById(R.id.eidtText1);
+
+        if(met.length() == 0){         // no search words
+            mTaskRealmResults = mRealm.where(Task.class).findAll();
+        } else {
+            mTaskRealmResults = mRealm.where(Task.class)
+                    .equalTo("category", met.getText().toString())
+                    .findAll();
+        }
+
+        reloadListView();
+    }
+    @Override
     protected void onDestroy(){
         super.onDestroy();
         mRealm.close();     // Realmクラスのオブジェクトを破棄
@@ -171,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
         Task task = new Task();
         task.setTitle("作業");
         task.setContents("プログラムを書いてPUSHする");
+        task.setCategory("タスク");
         task.setDate(new Date());
         task.setId(0);
         mRealm.beginTransaction();

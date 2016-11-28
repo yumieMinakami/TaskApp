@@ -30,7 +30,10 @@ public class InputActivity extends AppCompatActivity {
     private int         mYear, mMonth, mDay, mHour, mMinute;    // vars for Task's date & time
     private Button      mDateButton, mTimeButton;   // Buttons for setting Date & Time
     private EditText    mTitleEdit, mContentEdit;   // EditTexts for setting Date & Content
+    private EditText    mCategoryEdit;               // EditTexts for setting Category
     private Task        mTask;  // Object of Task-class
+
+
     private View.OnClickListener    mOnDateClickListener = new View.OnClickListener(){
         @Override
         public void onClick(View v){
@@ -97,6 +100,7 @@ public class InputActivity extends AppCompatActivity {
 
         mTitleEdit = (EditText) findViewById(R.id.title_edit_text);
         mContentEdit = (EditText) findViewById(R.id.content_edit_text);
+        mCategoryEdit = (EditText) findViewById(R.id.category_edit_text);
 
         Intent intent = getIntent();
         mTask = (Task) intent.getSerializableExtra(MainActivity.EXTRA_TASK);    // get Task from Intent's Extra
@@ -113,6 +117,7 @@ public class InputActivity extends AppCompatActivity {
             // case Change, update title, content and the updated time
             mTitleEdit.setText(mTask.getTitle());
             mContentEdit.setText(mTask.getContents());
+            mCategoryEdit.setText(mTask.getCategory());
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(mTask.getDate());
@@ -149,9 +154,11 @@ public class InputActivity extends AppCompatActivity {
 
         String title = mTitleEdit.getText().toString();
         String content = mContentEdit.getText().toString();
+        String category = mCategoryEdit.getText().toString();
 
         mTask.setTitle(title);
         mTask.setContents(content);
+        mTask.setCategory(category);
         GregorianCalendar calendar = new GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute);
         Date date = calendar.getTime();
         mTask.setDate(date);
@@ -162,7 +169,7 @@ public class InputActivity extends AppCompatActivity {
 
         realm.close();  // call CLOSE
 
-        // measures for close/down app
+        // measures for close/down app for andeoid 6 or later
         Bundle bundle = new Bundle();   // Create new Bundle
         Intent resultIntent = new Intent(getApplicationContext(), TaskAlarmReceiver.class);  // Create Intent which wakes TaskAlarmReceiver
         bundle.putParcelable(MainActivity.EXTRA_TASK, Parcels.wrap(mTask)); // reference Parcel for bundle
